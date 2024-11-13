@@ -1,0 +1,59 @@
+/* עיצוב מיכל ההרשמה */
+.register-container {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    margin-top: 100px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* כותרת */
+.register-container h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+/* שדה קלט */
+.input-field {
+    width: 90%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* כפתור הרשמה */
+.register-button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.register-button:hover {
+    background-color: #45a049;
+}
+
+.register-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* הודעת שגיאה */
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 10px;
+}
