@@ -10,6 +10,7 @@ export interface IMissileDetails extends Document {
 export interface Attack {
     _id: string;
     missileName: string;
+    location: string;
     destination: string;
     missileDetails: any;
     status: "Launched" | "Hit" | "Intercepted"

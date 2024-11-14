@@ -7,6 +7,7 @@ const BASE_URL = "http://localhost:5000/api/attacks/";
 
 interface AttackState {
     attacks: Attack[]
+    attacksToDefend: Attack[]
     status: 'idle' | 'loading' | 'succeeded'| 'failed'
     error: string | null
     
@@ -14,14 +15,21 @@ interface AttackState {
 
 const initialState: AttackState = {
     attacks: [],
+    attacksToDefend: [],
     status: 'idle',
     error: null,
     
 }
 
-export const fetchAttacksByLocation = createAsyncThunk('attacks/fetchAttacks', async (destination: string) : Promise<Attack[] | undefined> => {
+export const fetchAttacksByDestination = createAsyncThunk('attacks/fetchAttacks', async (destination: string) : Promise<Attack[] | undefined> => {
     
-    const response = await axios.get(`${BASE_URL}${destination}`);    
+    const response = await axios.get(`${BASE_URL}destination/${destination}`);    
+    return response.data;
+});
+
+export const fetchAttacksByLocation = createAsyncThunk('attacks/fetchAttacks', async (location: string) : Promise<Attack[] | undefined> => {
+    
+    const response = await axios.get(`${BASE_URL}location/${location}`);    
     return response.data;
 });
 
@@ -41,19 +49,32 @@ export const attackSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-        // .addCase(fetchUsers.pending, (state) => {
-        //     state.status = 'loading';
-        // })
-        // .addCase(fetchUsers.fulfilled, (state, action) => {
-        //     if(action.payload) 
-        //     state.users = action.payload;
-        //     state.status = 'succeeded';
+        .addCase(fetchAttacksByDestination.pending, (state) => {
+            state.status = 'loading';
+        })
+        .addCase(fetchAttacksByDestination.fulfilled, (state, action) => {
+            if(action.payload) 
+            state.attacksToDefend = action.payload;
+            state.status = 'succeeded';
             
-        // })
-        // .addCase(fetchUsers.rejected, (state, action) => {
-        //     state.status = 'failed';
-        //     state.error = action.error.message ?? 'Unknown error';
-        // })
+        })
+        .addCase(fetchAttacksByDestination.rejected, (state, action) => {
+            state.status = 'failed';
+            state.error = action.error.message ?? 'Unknown error';
+        })
+        .addCase(fetchAttacksByLocation.pending, (state) => {
+            state.status = 'loading';
+        })
+        .addCase(fetchAttacksByLocation.fulfilled, (state, action) => {
+            if(action.payload) 
+            state.attacks = action.payload;
+            state.status = 'succeeded';
+            
+        })
+        .addCase(fetchAttacksByLocation.rejected, (state, action) => {
+            state.status = 'failed';
+            state.error = action.error.message ?? 'Unknown error';
+        })
         .addCase(addAttack.pending, (state) => {
             state.status = 'loading';
             
@@ -61,7 +82,6 @@ export const attackSlice = createSlice({
         .addCase(addAttack.fulfilled, (state, action) => {
             state.status = 'succeeded';
             state.attacks.push(action.payload);
-            console.log(action.payload);
             
         })
         .addCase(addAttack.rejected, (state, action) => {

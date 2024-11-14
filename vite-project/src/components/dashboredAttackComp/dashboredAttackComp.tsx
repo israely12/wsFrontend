@@ -44,17 +44,8 @@ const DashboardAttack: React.FC = () => {
         return distance / speed; // זמן פגיעה בשניות
     };
 
-    // const setTimer = (speed: number) => {
-    //     const arrivalTime = speed;
-    //     setTimeout(() => {
-    //         alert( "The missile has arrived");
-    //     }, arrivalTime * 1000);
-    //     return arrivalTime;
-        
-    // }
-
     // Launch the weapon and log the attack
-    const handleLaunch = (weaponName: string, speed: number, intercepts: string[], price: number, amount: number) => {
+    const handleLaunch = (weaponName: string, speed: number, intercepts: string[], price: number, amount: any) => {
         if (!selectedTarget) {
             alert('Please select a target before launching.');
             return;
@@ -66,6 +57,7 @@ const DashboardAttack: React.FC = () => {
         const newAttack: Attack = {
             _id: Math.random().toString(36).substring(7), // ניתן להשתמש ב-ID אקראי או ID מהשרת
             missileName: weaponName,
+            location: currentUser!.responseData.organization,
             destination: selectedTarget,
             missileDetails: {  // יצירת פרטי טיל בצורה נכונה
                 speed: speed,

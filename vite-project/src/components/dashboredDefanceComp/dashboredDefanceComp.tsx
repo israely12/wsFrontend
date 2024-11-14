@@ -66,6 +66,7 @@ const DashboardAttack: React.FC = () => {
         const newAttack: Attack = {
             _id: Math.random().toString(36).substring(7), // ניתן להשתמש ב-ID אקראי או ID מהשרת
             missileName: weaponName,
+            
             destination: selectedTarget,
             missileDetails: {  // יצירת פרטי טיל בצורה נכונה
                 speed: speed,
