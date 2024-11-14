@@ -7,7 +7,7 @@ const BASE_URL = "http://localhost:5000/api/attacks/";
 
 interface AttackState {
     attacks: Attack[]
-    attacksToDefend: Attack[]
+    attacksToDefend: Attack[] 
     status: 'idle' | 'loading' | 'succeeded'| 'failed'
     error: string | null
     
@@ -21,21 +21,24 @@ const initialState: AttackState = {
     
 }
 
-export const fetchAttacksByDestination = createAsyncThunk('attacks/fetchAttacks', async (destination: string) : Promise<Attack[] | undefined> => {
+export const fetchAttacksByDestination = createAsyncThunk('attacksToDefend/fetchAttacks', async (destination: string) : Promise<Attack[] | undefined> => {
     
     const response = await axios.get(`${BASE_URL}destination/${destination}`);    
+    
     return response.data;
 });
 
-export const fetchAttacksByLocation = createAsyncThunk('attacks/fetchAttacks', async (location: string) : Promise<Attack[] | undefined> => {
+export const fetchAttacksByLocation = createAsyncThunk('attacks/fetchSentAttacks', async (location: string) : Promise<Attack[] | undefined> => {
     
-    const response = await axios.get(`${BASE_URL}location/${location}`);    
+    const response = await axios.get(`${BASE_URL}location/${location}`);
+        
     return response.data;
 });
 
 export const addAttack = createAsyncThunk('attacks/addAttack', async (attack:Partial<Attack>) => {
     
     const response = await axios.post(`${BASE_URL}add`, attack);
+
     return response.data;  
 })
 
@@ -54,8 +57,9 @@ export const attackSlice = createSlice({
         })
         .addCase(fetchAttacksByDestination.fulfilled, (state, action) => {
             if(action.payload) 
-            state.attacksToDefend = action.payload;
             state.status = 'succeeded';
+            state.attacksToDefend = [];action.payload;
+            
             
         })
         .addCase(fetchAttacksByDestination.rejected, (state, action) => {
@@ -67,7 +71,7 @@ export const attackSlice = createSlice({
         })
         .addCase(fetchAttacksByLocation.fulfilled, (state, action) => {
             if(action.payload) 
-            state.attacks = action.payload;
+            state.attacks = action.payload;  
             state.status = 'succeeded';
             
         })
@@ -81,7 +85,10 @@ export const attackSlice = createSlice({
         })
         .addCase(addAttack.fulfilled, (state, action) => {
             state.status = 'succeeded';
-            state.attacks.push(action.payload);
+            state.attacks = action.payload;
+            console.log(state.attacks);
+          
+            
             
         })
         .addCase(addAttack.rejected, (state, action) => {

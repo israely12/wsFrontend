@@ -2,49 +2,57 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppDispatch, RootState } from "../../store/store";
 import { Attack } from "../../types/Attack";
-import { addAttack } from "../../store/features/attackSlice";
+import { addAttack, fetchAttacksByDestination, fetchAttacksByLocation } from "../../store/features/attackSlice";
 import "./dashBoredAttack.css"
 import { IMissileDetails } from "../../types/Attack";
-import { spread } from 'axios';
+import { LoginResponse } from '../../store/features/userSlice';
 
 const DashboardAttack: React.FC = () => {
     const currentUser = useSelector((state: RootState) => state.users.currentUser);
+    const [user, setUser] = useState<LoginResponse>({message: '', responseData: {username: '', organization: '', weapons: []}, token: ''});
     const dispatch = useDispatch<AppDispatch>();
 
     const [selectedTarget, setSelectedTarget] = useState<string>('');
     const [attacks, setAttacks] = useState<Attack[]>([]);
 
     useEffect(() => {
-        console.log("Current User:", currentUser);
-    }, [currentUser]);
-    
+        dispatch(fetchAttacksByLocation(currentUser!.responseData.organization));
+        
+        setUser(currentUser!);
+        
+    }, [dispatch]);
 
-    // קריאת הנתונים מה-localStorage בעת אתחול הרכיב
-    useEffect(() => {
-        const storedAttacks = localStorage.getItem('attacks');
-        if (storedAttacks) {
-            setAttacks(JSON.parse(storedAttacks)); // המרת המידע מ-missing storage לאובייקט
-        }
-    }, []);
 
-    // שמירת ההתקפות ב-localStorage כל פעם שהסטייט של attacks משתנה
+
     useEffect(() => {
         if (attacks.length > 0) {
             localStorage.setItem('attacks', JSON.stringify(attacks));
         }
     }, [attacks]);
 
-    // Handle change in target selection
+
+    // useEffect(() => {
+    //     const storedAttacks = localStorage.getItem('attacks');
+    //     if (storedAttacks) {
+    //         setAttacks(JSON.parse(storedAttacks));  
+    //     }
+    // }, []);
+
+    
+
+    // useEffect(() => {
+        
+    // }, [dispatch]);
+
+    
     const handleTargetChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedTarget(event.target.value);
     };
 
-    // Calculate arrival time based on weapon speed and simulate distance (assume fixed distance for now)
     const calculateArrivalTime = (speed: number, distance: number = 100): number => {
-        return distance / speed; // זמן פגיעה בשניות
+        return distance / speed;    
     };
 
-    // Launch the weapon and log the attack
     const handleLaunch = (weaponName: string, speed: number, intercepts: string[], price: number, amount: any) => {
         if (!selectedTarget) {
             alert('Please select a target before launching.');
@@ -53,37 +61,39 @@ const DashboardAttack: React.FC = () => {
 
         const arrivalTime = speed;
 
-        // יצירת אובייקט התקפה בצורה נכונה
         const newAttack: Attack = {
-            _id: Math.random().toString(36).substring(7), // ניתן להשתמש ב-ID אקראי או ID מהשרת
+            _id: Math.random().toString(36).substring(7),     
             missileName: weaponName,
             location: currentUser!.responseData.organization,
             destination: selectedTarget,
-            missileDetails: {  // יצירת פרטי טיל בצורה נכונה
+            missileDetails: {  
                 speed: speed,
-                intercepts: intercepts,  // מערך של טילים שניתן ליירט
+                intercepts: intercepts,  
                 price: price,
                 amount: amount,
-                arrivalTime: arrivalTime,  // זמן הגעת הטיל
+                arrivalTime: arrivalTime,  
             },
-            status: 'Launched'  // סטטוס התקיפה
+            status: 'Launched'  
         };
 
-        // שלח את אובייקט ההתקפה ל-redux
+
         dispatch(addAttack(newAttack));
-        // עדכן את הסטייט של ההתקפות עם ההתקפה החדשה
+
         setAttacks(prevAttacks => [...prevAttacks, newAttack]);
 
-        // עדכון כמות הטילים
-        const weaponIndex = currentUser?.responseData.weapons.findIndex(w => w.name === weaponName);
-        if (weaponIndex !== undefined && weaponIndex >= 0 && currentUser!.responseData.weapons[weaponIndex].amount > 0) {
-            currentUser!.responseData.weapons[weaponIndex].amount -= 1;
-        }
+        // const weaponIndex = currentUser?.responseData.weapons.findIndex(w => w.name === weaponName);
+        // if (weaponIndex !== undefined && weaponIndex >= 0 && currentUser!.responseData.weapons[weaponIndex].amount > 0) {
+        //     currentUser!.responseData.weapons[weaponIndex].amount -= 1;
+        // }
     };
 
-    if (!currentUser) {
-        return <div>Loading user data...</div>;
-    }
+    if (currentUser === null || undefined)
+        currentUser == localStorage.getItem('currentUser')
+     
+        // console.log("Current User is nulll:", currentUser);
+        // return <div>Loading user data...</div>;
+        const attacksList = useSelector((state: RootState) => state.attacks.attacks);
+        
 
     return (
         <div className="dashboard-attack">
@@ -132,7 +142,7 @@ const DashboardAttack: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {attacks.map((attack: Attack) => (
+                        {attacksList.map((attack: Attack) => (
                             <tr key={attack._id}>
                                 <td>{attack.missileName}</td>
                                 <td>{attack.destination}</td>

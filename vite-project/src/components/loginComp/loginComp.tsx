@@ -28,8 +28,9 @@ const Login: React.FC = () => {
         
       setUsername('');
       setPassword('');
-
-      navigate('/dashboardAttack');
+      
+      // navigate('/dashboardAttack');
+      navigate('/dashboardDefance');
       }
   };
 

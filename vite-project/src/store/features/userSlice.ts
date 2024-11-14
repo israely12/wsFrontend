@@ -58,13 +58,13 @@ export const loginUser = createAsyncThunk('users/loginUser', async (user:Partial
     
     if(response.data){
     const token : string = response.data.token;
-    localStorage.removeItem('token');
-    localStorage.removeItem('userData');
+
     localStorage.removeItem('attacks');
     localStorage.setItem('token', token);
-    localStorage.setItem('userData', JSON.stringify(response.data.responseData));
-
+    localStorage.setItem('userData', JSON.stringify(response.data));
+        
     return response.data;
+
     }
     return;
     
@@ -108,6 +108,7 @@ export const usersSlice = createSlice({
         .addCase(loginUser.fulfilled, (state, action) => {
             state.status = 'succeeded';
             state.currentUser = action.payload;
+            
         })
         .addCase(loginUser.rejected, (state, action) => {
             state.status = 'failed';

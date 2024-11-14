@@ -2,58 +2,46 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppDispatch, RootState } from "../../store/store";
 import { Attack } from "../../types/Attack";
-import { addAttack } from "../../store/features/attackSlice";
-import "./dashBoredAttack.css"
+import { addAttack ,fetchAttacksByDestination} from "../../store/features/attackSlice";
 import { IMissileDetails } from "../../types/Attack";
-import { spread } from 'axios';
+import { LoginResponse } from '../../store/features/userSlice';
 
-const DashboardAttack: React.FC = () => {
+import { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit';
+
+const DashboardDefence: React.FC = () => {
+
     const currentUser = useSelector((state: RootState) => state.users.currentUser);
-    const dispatch = useDispatch<AppDispatch>();
+
+    const attackToDefend = useSelector((state: RootState) => state.attacks.attacksToDefend);
+    const dispatch = useDispatch<ThunkDispatch<RootState, unknown, UnknownAction >>();
 
     const [selectedTarget, setSelectedTarget] = useState<string>('');
     const [attacks, setAttacks] = useState<Attack[]>([]);
 
     useEffect(() => {
-        console.log("Current User:", currentUser);
-    }, [currentUser]);
+         
+         dispatch(fetchAttacksByDestination(currentUser!.responseData.organization));
+        
+    }, [dispatch]);
     
 
-    // קריאת הנתונים מה-localStorage בעת אתחול הרכיב
-    useEffect(() => {
-        const storedAttacks = localStorage.getItem('attacks');
-        if (storedAttacks) {
-            setAttacks(JSON.parse(storedAttacks)); // המרת המידע מ-missing storage לאובייקט
-        }
-    }, []);
+    // useEffect(() => {
+    //     const storedAttacks = localStorage.getItem('attacks');
+    //     if (storedAttacks) {
+    //         setAttacks(JSON.parse(storedAttacks));  
+    //     }
+    // }, []);
 
-    // שמירת ההתקפות ב-localStorage כל פעם שהסטייט של attacks משתנה
-    useEffect(() => {
-        if (attacks.length > 0) {
-            localStorage.setItem('attacks', JSON.stringify(attacks));
-        }
-    }, [attacks]);
+    // useEffect(() => {
+    //     if (attacks.length > 0) {
+    //         localStorage.setItem('attacks', JSON.stringify(attacks));
+    //     }
+    // }, [attacks]);
 
-    // Handle change in target selection
     const handleTargetChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedTarget(event.target.value);
     };
 
-    // Calculate arrival time based on weapon speed and simulate distance (assume fixed distance for now)
-    const calculateArrivalTime = (speed: number, distance: number = 100): number => {
-        return distance / speed; // זמן פגיעה בשניות
-    };
-
-    // const setTimer = (speed: number) => {
-    //     const arrivalTime = speed;
-    //     setTimeout(() => {
-    //         alert( "The missile has arrived");
-    //     }, arrivalTime * 1000);
-    //     return arrivalTime;
-        
-    // }
-
-    // Launch the weapon and log the attack
     const handleLaunch = (weaponName: string, speed: number, intercepts: string[], price: number, amount: number) => {
         if (!selectedTarget) {
             alert('Please select a target before launching.');
@@ -62,28 +50,25 @@ const DashboardAttack: React.FC = () => {
 
         const arrivalTime = speed;
 
-        // יצירת אובייקט התקפה בצורה נכונה
         const newAttack: Attack = {
-            _id: Math.random().toString(36).substring(7), // ניתן להשתמש ב-ID אקראי או ID מהשרת
+            _id: Math.random().toString(36).substring(7),
             missileName: weaponName,
-            
+            location: currentUser!.responseData.organization,
             destination: selectedTarget,
-            missileDetails: {  // יצירת פרטי טיל בצורה נכונה
+            missileDetails: {    
                 speed: speed,
-                intercepts: intercepts,  // מערך של טילים שניתן ליירט
+                intercepts: intercepts,  
                 price: price,
                 amount: amount,
-                arrivalTime: arrivalTime,  // זמן הגעת הטיל
+                arrivalTime: arrivalTime,    
             },
-            status: 'Launched'  // סטטוס התקיפה
+            status: 'Launched'  
         };
 
-        // שלח את אובייקט ההתקפה ל-redux
         dispatch(addAttack(newAttack));
-        // עדכן את הסטייט של ההתקפות עם ההתקפה החדשה
+
         setAttacks(prevAttacks => [...prevAttacks, newAttack]);
 
-        // עדכון כמות הטילים
         const weaponIndex = currentUser?.responseData.weapons.findIndex(w => w.name === weaponName);
         if (weaponIndex !== undefined && weaponIndex >= 0 && currentUser!.responseData.weapons[weaponIndex].amount > 0) {
             currentUser!.responseData.weapons[weaponIndex].amount -= 1;
@@ -118,7 +103,7 @@ const DashboardAttack: React.FC = () => {
                 ))}
             </div>
 
-            <div className="target-selector">
+            {/* <div className="target-selector">
                 <label>Select Target Area:</label>
                 <select value={selectedTarget} onChange={handleTargetChange}>
                     <option value="">Choose Target</option>
@@ -127,24 +112,24 @@ const DashboardAttack: React.FC = () => {
                     <option value="IDF - Center">Center Israel</option>
                     <option value="IDF - West Bank">West Bank Israel</option>
                 </select>
-            </div>
+            </div> */}
 
             <div className="attack-log">
-                <h3>Attack Log</h3>
+                <h3>Defance Log</h3>
                 <table className="attack-table">
                     <thead>
                         <tr>
                             <th>Missile</th>
-                            <th>Destination</th>
+                            <th>Launch Location</th>
                             <th>Arrival Time (seconds)</th>
                             <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {attacks.map((attack: Attack) => (
+                        {attackToDefend.map((attack: Attack) => (
                             <tr key={attack._id}>
                                 <td>{attack.missileName}</td>
-                                <td>{attack.destination}</td>
+                                <td>{attack.location}</td>
                                 <td>{attack.missileDetails.arrivalTime}</td>
                                 <td>{attack.status}</td>
                             </tr>
@@ -156,4 +141,4 @@ const DashboardAttack: React.FC = () => {
     );
 };
 
-export default DashboardAttack;
+export default DashboardDefence;
