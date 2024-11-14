@@ -4,8 +4,29 @@ import axios from 'axios'
 
 const BASE_URL = "http://localhost:5000/api/users/";
 
+export interface Weapon {
+    name: string;
+    description: string;
+    speed: number;
+    intercepts: string[];
+    price: number;
+    amount: number;
+}
+
+export interface UserResponseData {
+    username: string;
+    organization: string;
+    weapons: Weapon[];
+}
+
+export interface LoginResponse {
+    message: string;
+    responseData: UserResponseData;
+    token: string;
+}
 interface UserState {
     users: User[]
+    currentUser: LoginResponse | null
     status: 'idle' | 'loading' | 'succeeded'| 'failed'
     error: string | null
     
@@ -13,6 +34,7 @@ interface UserState {
 
 const initialState: UserState = {
     users: [],
+    currentUser: null,
     status: 'idle',
     error: null,
     
@@ -36,7 +58,12 @@ export const loginUser = createAsyncThunk('users/loginUser', async (user:Partial
     
     if(response.data){
     const token : string = response.data.token;
+    localStorage.removeItem('token');
+    localStorage.removeItem('userData');
+    localStorage.removeItem('attacks');
     localStorage.setItem('token', token);
+    localStorage.setItem('userData', JSON.stringify(response.data.responseData));
+
     return response.data;
     }
     return;
@@ -80,7 +107,7 @@ export const usersSlice = createSlice({
         })
         .addCase(loginUser.fulfilled, (state, action) => {
             state.status = 'succeeded';
-            state.users.push(action.payload);
+            state.currentUser = action.payload;
         })
         .addCase(loginUser.rejected, (state, action) => {
             state.status = 'failed';

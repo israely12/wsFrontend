@@ -1,0 +1,87 @@
+.dashboard-attack {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.weapon-button {
+    background-color: #3498db;
+    color: white;
+    font-size: 1rem;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.weapon-button:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+}
+
+.weapon-button:hover:not(:disabled) {
+    background-color: #2980b9;
+}
+
+.target-selector {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.target-selector label {
+    font-size: 1rem;
+    margin-right: 10px;
+}
+
+.target-selector select {
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.attack-log {
+    margin-top: 20px;
+}
+
+.attack-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #ddd;
+}
+
+.attack-table th, .attack-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.attack-table th {
+    background-color: #3498db;
+    color: white;
+}
+
+.attack-table td {
+    background-color: #f9f9f9;
+}
+
+.attack-table tr:hover {
+    background-color: #f1f1f1;
+}

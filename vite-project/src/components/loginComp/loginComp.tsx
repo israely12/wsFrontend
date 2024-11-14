@@ -21,14 +21,16 @@ const Login: React.FC = () => {
     
     const user = { username, password };
     await dispatch(loginUser(user));
+    
 
     if (status === 'succeeded') {
        
         
       setUsername('');
       setPassword('');
+
+      navigate('/dashboardAttack');
       }
-      console.log("ggggggggggggg");
   };
 
   return (
